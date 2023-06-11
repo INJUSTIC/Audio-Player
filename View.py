@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import messagebox
 
 
 class View(tk.Frame):
@@ -37,14 +38,22 @@ class View(tk.Frame):
         self.prev_button.pack()
 
     def select_next_track(self, current_index):
+        self.track_listbox.selection_clear(0, tk.END)
         next_index = (current_index + 1) % self.track_listbox.size()
         self.track_listbox.activate(next_index)
+        self.track_listbox.selection_set(next_index, last=None)
 
     def select_prev_track(self, current_index):
-        next_index = abs(current_index - 1) % self.track_listbox.size()
-        self.track_listbox.activate(next_index)
+        self.track_listbox.selection_clear(0, tk.END)
+        prev_index = self.track_listbox.size() - 1 if current_index == 0 else current_index - 1
+        self.track_listbox.activate(prev_index)
+        self.track_listbox.selection_set(prev_index, last=None)
 
+    def insert_track(self, name):
+        self.track_listbox.insert(tk.END, name)
 
+    def remove_track(self, index):
+        self.track_listbox.delete(index)
 
-
-
+    def show_error(self, message):
+        messagebox.showerror('Error', message)

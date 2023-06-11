@@ -71,12 +71,14 @@ class Controller:
         self.mixer.music.unpause()
 
     def next_track(self):
+
         self.stop_track()
         current_index = self.view.track_listbox.curselection()
         if current_index:
             self.view.select_next_track(current_index[0])
 
     def prev_track(self):
+
         self.stop_track()
         current_index = self.view.track_listbox.curselection()
         if current_index:

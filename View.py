@@ -1,5 +1,6 @@
 import tkinter as tk
 from PIL import Image, ImageTk
+import pygame.mixer
 
 class View(tk.Frame):
     def __init__(self, master):
@@ -17,6 +18,8 @@ class View(tk.Frame):
         resume_image = Image.open("resume.png")
         add_track_image = Image.open("add_track.png")
         remove_track_image = Image.open("remove_track.png")
+        volume_up_image = Image.open("volume_up.png")
+        volume_down_image = Image.open("volume_down.png")
 
         play_image = play_image.resize((30, 30))
         pause_image = pause_image.resize((30, 30))
@@ -26,6 +29,8 @@ class View(tk.Frame):
         resume_image = resume_image.resize((30, 30))
         add_track_image = add_track_image.resize((30, 30))
         remove_track_image = remove_track_image.resize((30, 30))
+        volume_up_image = volume_up_image.resize((30, 30))
+        volume_down_image = volume_down_image.resize((30, 30))
 
         self.play_icon = ImageTk.PhotoImage(play_image)
         self.pause_icon = ImageTk.PhotoImage(pause_image)
@@ -35,6 +40,8 @@ class View(tk.Frame):
         self.resume_icon = ImageTk.PhotoImage(resume_image)
         self.add_track_icon = ImageTk.PhotoImage(add_track_image)
         self.remove_track_icon = ImageTk.PhotoImage(remove_track_image)
+        self.volume_up_icon = ImageTk.PhotoImage(volume_up_image)
+        self.volume_down_icon = ImageTk.PhotoImage(volume_down_image)
 
         self.track_listbox = tk.Listbox(master, width=60)
         self.track_listbox.pack()
@@ -66,10 +73,31 @@ class View(tk.Frame):
         self.prev_button = tk.Button(self.button_frame, image=self.prev_icon, compound=tk.LEFT)
         self.prev_button.pack(side=tk.LEFT, padx=5)
 
+        self.button_frame_volume = tk.Frame(master)
+        self.button_frame_volume.pack()
+
+        self.volume_up_button = tk.Button(self.button_frame_volume, image=self.volume_up_icon, command=self.volume_up)
+        self.volume_up_button.pack(side=tk.LEFT, padx=5)
+
+        self.volume_down_button = tk.Button(self.button_frame_volume, image=self.volume_down_icon, command=self.volume_down)
+        self.volume_down_button.pack(side=tk.LEFT, padx=5)
+
+    def volume_up(self):
+        current_volume = pygame.mixer.music.get_volume()
+        if current_volume < 1.0:
+            new_volume = min(current_volume + 0.1, 1.0)
+            pygame.mixer.music.set_volume(new_volume)
+
+    def volume_down(self):
+        current_volume = pygame.mixer.music.get_volume()
+        if current_volume > 0.0:
+            new_volume = max(current_volume - 0.1, 0.0)
+            pygame.mixer.music.set_volume(new_volume)
+
     def select_next_track(self, current_index):
         next_index = (current_index + 1) % self.track_listbox.size()
         self.track_listbox.activate(next_index)
 
     def select_prev_track(self, current_index):
-        next_index = abs(current_index - 1) % self.track_listbox.size()
-        self.track_listbox.activate(next_index)
+        prev_index = (current_index - 1) % self.track_listbox.size()
+        self.track_listbox.activate(prev_index)

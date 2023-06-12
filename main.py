@@ -1,4 +1,3 @@
-import pygame
 from tkinter import *
 
 from Controller import Controller

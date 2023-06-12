@@ -4,12 +4,9 @@ from View import View
 import tkinter as tk
 from tkinter import filedialog
 from mutagen.mp3 import MP3
-<<<<<<< HEAD
 from tkinter import messagebox
 import pygame.mixer as mixer
-=======
 
->>>>>>> 6e08236a4627cd9e9cf6251eda57910d860754ed
 
 class Controller:
     def __init__(self, model: AudioPlayer, view: View):
@@ -38,11 +35,8 @@ class Controller:
             return
         track_name = track_loc.split('/')[-1].split('.')[0]
         if self.model.check_for_track(track_name):
-<<<<<<< HEAD
             messagebox.showerror('Error', "There is already a soundtrack with such name")
-=======
             self.view.show_error("There is already soundtrack with such name")
->>>>>>> 6e08236a4627cd9e9cf6251eda57910d860754ed
         else:
             duration = MP3(track_loc).info.length
             self.model.add_track(track_name, duration, track_loc)
@@ -55,19 +49,16 @@ class Controller:
             self.view.remove_track(selected_index)
             self.model.remove_track(track_to_remove)
         else:
-<<<<<<< HEAD
             messagebox.showerror('Error', 'Choose a track to delete')
 
     def play_track(self):
         if not self.view.track_listbox.curselection():
             messagebox.showerror('Error', "Choose a track to play")
-=======
             self.view.show_error("Choose track to delete")
 
     def play_track(self):
         if not self.view.track_listbox.curselection():
             self.view.show_error("Choose track to play")
->>>>>>> 6e08236a4627cd9e9cf6251eda57910d860754ed
             return
         track_to_play = self.view.track_listbox.get(tk.ACTIVE)
         try:
@@ -103,7 +94,6 @@ class Controller:
         current_index = self.view.track_listbox.curselection()
         if current_index:
             self.view.select_prev_track(current_index[0])
-<<<<<<< HEAD
 
     def volume_up(self):
         current_volume = pygame.mixer.music.get_volume()
@@ -112,10 +102,8 @@ class Controller:
             pygame.mixer.music.set_volume(new_volume)
 
     def volume_down(self):
-        current_volume = pygame.mixer.music.get_volume()
-        if current_volume > 0.0:
-            new_volume = max(current_volume - 0.1, 0.0)
-            pygame.mixer.music.set_volume(new_volume)
-=======
-            self.play_track()
->>>>>>> 6e08236a4627cd9e9cf6251eda57910d860754ed
+        current_volume = self.mixer.music.get_volume()
+        if current_volume > 0:
+            new_volume = max(current_volume - 0.1, 0)
+            self.mixer.music.set_volume(new_volume)
+

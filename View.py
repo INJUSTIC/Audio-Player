@@ -1,11 +1,8 @@
 import tkinter as tk
 from PIL import Image, ImageTk
-<<<<<<< HEAD
 import pygame.mixer
-=======
 from tkinter import messagebox
 
->>>>>>> 6e08236a4627cd9e9cf6251eda57910d860754ed
 
 class View(tk.Frame):
     def __init__(self, master):
@@ -106,10 +103,8 @@ class View(tk.Frame):
         self.track_listbox.selection_set(next_index, last=None)
 
     def select_prev_track(self, current_index):
-<<<<<<< HEAD
         prev_index = (current_index - 1) % self.track_listbox.size()
         self.track_listbox.activate(prev_index)
-=======
         self.track_listbox.selection_clear(0, tk.END)
         prev_index = self.track_listbox.size() - 1 if current_index == 0 else current_index - 1
         self.track_listbox.activate(prev_index)
@@ -123,4 +118,3 @@ class View(tk.Frame):
 
     def show_error(self, message):
         messagebox.showerror('Error', message)
->>>>>>> 6e08236a4627cd9e9cf6251eda57910d860754ed

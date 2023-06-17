@@ -1,7 +1,7 @@
 from FileManager import FileManager
 
 
-class AudioPlayer:
+class Model:
     def __init__(self):
         self.tracks = FileManager.read_tracks_from_file()
 
@@ -34,6 +34,7 @@ class AudioPlayer:
         for track in self.tracks:
             names.append(track.name)
         return names
+
 
 class AudioTrack:
     def __init__(self, name, duration, path):

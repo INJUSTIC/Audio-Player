@@ -41,7 +41,8 @@ class Controller:
             messagebox.showerror('Error', "There is already a soundtrack with such name")
             self.view.show_error("There is already soundtrack with such name")
         else:
-            duration = MP3(track_loc).info.length
+            duration = int(MP3(track_loc).info.length)
+            print(duration)
             self.model.add_track(track_name, duration, track_loc)
             self.view.insert_track(track_name)
 
@@ -94,7 +95,7 @@ class Controller:
         self.view.change_play_to_stop_icon()
         self.view.set_song_slider(song.info.length * 1000)
         self.view.update_song_slider(0)
-        self.view.song_slider_on()
+        self.view.song_slider_on(track.duration)
         self.isPlaying = True
         self.curr_track = track_to_play
         self.check_for_track_ending()

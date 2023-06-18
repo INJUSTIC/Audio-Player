@@ -1,6 +1,5 @@
 import tkinter as tk
 from PIL import Image, ImageTk
-import pygame.mixer
 from tkinter import messagebox
 from tkinter import ttk
 
@@ -69,19 +68,29 @@ class View(tk.Frame):
                                        style="Custom.Vertical.TScale",
                                        length=200)
         self.volume_icon_label = tk.Label(self.master, image=self.volume_icon)
-        self.volume_icon_label.pack(side=tk.LEFT, padx=20, pady=20)
+        self.volume_icon_label.pack(side=tk.LEFT, padx=5)
         self.volume_slider.set(50)
-        self.volume_slider.pack(side=tk.LEFT, padx=20, pady=20)
+        self.volume_slider.pack(side=tk.LEFT, padx=5)
+        self.song_time_label = tk.Label(self.master)
 
         self.song_slider = ttk.Scale(self.master, from_=0, orient=tk.HORIZONTAL,
                                      style="Custom.Horizontal.TScale",
                                      length=300)
+
+        self.curr_time_label = tk.Label(self.master)
 
     def set_song_slider(self, length):
         self.song_slider.config(to=length)
 
     def update_song_slider(self, position):
         self.song_slider.set(position)
+        time_in_secs = position / 1000
+        mins = int(time_in_secs / 60)
+        secs = int(time_in_secs - mins * 60)
+        secs_text = str(secs)
+        if secs < 10:
+            secs_text = f'0{secs}'
+        self.curr_time_label.config(text=f'{mins}:{secs_text}')
 
     def select_track(self, index):
         self.track_listbox.selection_clear(0, tk.END)
@@ -100,11 +109,19 @@ class View(tk.Frame):
     def change_stop_to_play_icon(self):
         self.play_stop_button.config(image=self.play_icon)
 
-    def song_slider_on(self):
-        self.song_slider.pack(side=tk.LEFT, padx=20, pady=20)
+    def song_slider_on(self, song_time):
+        mins = int(song_time/60)
+        secs = int(song_time - mins * 60)
+        self.song_time_label.config(text=f'{mins}:{secs}')
+        self.song_time_label.pack(side=tk.LEFT, padx=5)
+        self.song_slider.pack(side=tk.LEFT, padx=5)
+        self.curr_time_label.config(text=f'0:00')
+        self.curr_time_label.pack(side=tk.LEFT, padx=5)
 
     def song_slider_off(self):
         self.song_slider.pack_forget()
+        self.song_time_label.pack_forget()
+        self.curr_time_label.pack_forget()
 
     def show_error(self, message):
         messagebox.showerror('Error', message)

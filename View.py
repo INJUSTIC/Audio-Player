@@ -51,11 +51,11 @@ class View(tk.Frame):
         self.play_stop_button = tk.Button(self.button_frame, image=self.play_icon, compound=tk.LEFT)
         self.play_stop_button.pack(side=tk.LEFT, padx=5)
 
-        self.next_button = tk.Button(self.button_frame, image=self.next_icon, compound=tk.LEFT)
-        self.next_button.pack(side=tk.LEFT, padx=5)
-
         self.prev_button = tk.Button(self.button_frame, image=self.prev_icon, compound=tk.LEFT)
         self.prev_button.pack(side=tk.LEFT, padx=5)
+
+        self.next_button = tk.Button(self.button_frame, image=self.next_icon, compound=tk.LEFT)
+        self.next_button.pack(side=tk.LEFT, padx=5)
 
         style = ttk.Style()
         style.configure("Custom.Horizontal.TScale",
@@ -112,7 +112,10 @@ class View(tk.Frame):
     def song_slider_on(self, song_time):
         mins = int(song_time/60)
         secs = int(song_time - mins * 60)
-        self.song_time_label.config(text=f'{mins}:{secs}')
+        secs_text = str(secs)
+        if secs < 10:
+            secs_text = f'0{secs}'
+        self.song_time_label.config(text=f'{mins}:{secs_text}')
         self.song_time_label.pack(side=tk.LEFT, padx=5)
         self.song_slider.pack(side=tk.LEFT, padx=5)
         self.curr_time_label.config(text=f'0:00')

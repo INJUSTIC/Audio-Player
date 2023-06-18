@@ -65,27 +65,28 @@ class View(tk.Frame):
                         sliderthickness=15,
                         borderwidth=0)
 
-        self.volume_slider = ttk.Scale(self.master, from_=0, to=100, orient=tk.HORIZONTAL,
-                                       style="Custom.Horizontal.TScale",
-                                       length=300)
+        self.volume_slider = ttk.Scale(self.master, from_=0, to=100, orient=tk.VERTICAL,
+                                       style="Custom.Vertical.TScale",
+                                       length=200)
         self.volume_icon_label = tk.Label(self.master, image=self.volume_icon)
         self.volume_icon_label.pack(side=tk.LEFT, padx=20, pady=20)
         self.volume_slider.set(50)
         self.volume_slider.pack(side=tk.LEFT, padx=20, pady=20)
 
-    def select_next_track(self, current_index):
-        self.track_listbox.selection_clear(0, tk.END)
-        next_index = (current_index + 1) % self.track_listbox.size()
-        self.track_listbox.activate(next_index)
-        self.track_listbox.selection_set(next_index, last=None)
+        self.song_slider = ttk.Scale(self.master, from_=0, orient=tk.HORIZONTAL,
+                                     style="Custom.Horizontal.TScale",
+                                     length=300)
 
-    def select_prev_track(self, current_index):
-        prev_index = (current_index - 1) % self.track_listbox.size()
-        self.track_listbox.activate(prev_index)
+    def set_song_slider(self, length):
+        self.song_slider.config(to=length)
+
+    def update_song_slider(self, position):
+        self.song_slider.set(position)
+
+    def select_track(self, index):
         self.track_listbox.selection_clear(0, tk.END)
-        prev_index = self.track_listbox.size() - 1 if current_index == 0 else current_index - 1
-        self.track_listbox.activate(prev_index)
-        self.track_listbox.selection_set(prev_index, last=None)
+        self.track_listbox.activate(index)
+        self.track_listbox.selection_set(index, last=None)
 
     def insert_track(self, name):
         self.track_listbox.insert(tk.END, name)
@@ -98,6 +99,12 @@ class View(tk.Frame):
 
     def change_stop_to_play_icon(self):
         self.play_stop_button.config(image=self.play_icon)
+
+    def song_slider_on(self):
+        self.song_slider.pack(side=tk.LEFT, padx=20, pady=20)
+
+    def song_slider_off(self):
+        self.song_slider.pack_forget()
 
     def show_error(self, message):
         messagebox.showerror('Error', message)

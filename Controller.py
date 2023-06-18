@@ -1,5 +1,3 @@
-import tkinter
-
 import pygame
 from Model import Model
 from View import View

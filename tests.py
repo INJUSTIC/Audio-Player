@@ -95,89 +95,192 @@ class TestAudioPlayer(unittest.TestCase):
             mock_showerror.assert_called_once_with("Error", "Choose a track to delete")
             del_file()
 
-    #Poniższe 6 nie działają bo w czasie wykonania funkcji play_track wyskocza błąd rekursji że jest przekroczony jej limit
-    # def test_play_track_no_track_selected(self):
-    #     self.controller.selected_track_pos = None
-    #
-    #     with patch.object(View, "show_error") as mock_show_error:
-    #         self.controller.play_track()
-    #
-    #         mock_show_error.assert_called_once_with("Choose track to play")
-    #         assert not self.controller.isPlaying
-    #
-    # def test_play_track_file_not_found(self):
-    #     track_to_play = "Track1"
-    #     track_path = "/path/to/track.mp3"
-    #     self.view.track_listbox.get.return_value = track_to_play
-    #     self.model.read_track.side_effect = FileNotFoundError(track_path)
-    #
-    #     with patch.object(View, "show_error") as mock_show_error:
-    #         self.controller.play_track()
-    #
-    #         mock_show_error.assert_called_once_with(f"No file found: {track_path}")
-    #         assert not self.controller.isPlaying
-    #
-    # def test_play_track_success(self):
-    #     track_to_play = "Track1"
-    #     track_path = "/path/to/track.mp3"
-    #     track_duration = 180
-    #     song_length = track_duration * 1000
-    #     self.view.track_listbox.get.return_value = track_to_play
-    #     self.model.read_track.return_value = Track(track_to_play, track_path, track_duration)
-    #
-    #     with patch.object(View, "change_play_to_stop_icon") as mock_change_play_to_stop_icon, \
-    #             patch.object(View, "set_song_slider") as mock_set_song_slider, \
-    #             patch.object(View, "update_song_slider") as mock_update_song_slider, \
-    #             patch.object(View, "song_slider_on") as mock_song_slider_on:
-    #         self.controller.play_track()
-    #
-    #         self.controller.mixer.music.load.assert_called_once_with(track_path)
-    #         self.controller.mixer.music.play.assert_called_once_with(loops=0)
-    #         mock_change_play_to_stop_icon.assert_called_once()
-    #         mock_set_song_slider.assert_called_once_with(song_length)
-    #         mock_update_song_slider.assert_called_once_with(0)
-    #         mock_song_slider_on.assert_called_once_with(track_duration)
-    #         assert self.controller.isPlaying
-    #         assert self.controller.curr_track_pos == self.controller.selected_track_pos
-    #
-    #     self.view.show_error.assert_called_once_with("Choose track to play")
-    #     assert not self.controller.isPlaying
-    # def test_stop_track(self):
-    #     self.set_up()
-    #     with patch("pygame.mixer.music.stop") as mock_stop:
-    #         self.controller.stop_track()
-    #         mock_stop.assert_called_once()
-    #     del_file()
-    #
-    # def pause_track(self):
-    #     self.set_up()
-    #     with patch("pygame.mixer.music.stop") as mock_stop:
-    #         self.controller.stop_track()
-    #         mock_stop.assert_called_once()
-    #     del_file()
-    #
-    # def unpause_track(self):
-    #     self.set_up()
-    #     with patch("pygame.mixer.music.stop") as mock_stop:
-    #         self.controller.stop_track()
-    #         mock_stop.assert_called_once()
-    #     del_file()
-    #
-    # def next_track(self):
-    #     self.set_up()
-    #     with patch("pygame.mixer.music.stop") as mock_stop:
-    #         self.controller.stop_track()
-    #         mock_stop.assert_called_once()
-    #     del_file()
-    #
-    # def prev_track(self):
-    #     self.set_up()
-    #     with patch("pygame.mixer.music.stop") as mock_stop:
-    #         self.controller.stop_track()
-    #         mock_stop.assert_called_once()
-    #     del_file()
+    # Poniższe 6 nie działają bo w czasie wykonania funkcji play_track wyskocza błąd rekursji że jest przekroczony jej limit
+    def test_play_track(self):
+        self.set_up()
 
-    #######################################################################
+        track_name = "A Day To Remember - End Of Me"
+        location = "D:/Users/vopor/Music/A Day To Remember - End Of Me.mp3"
+        duration = 180
+        self.model.add_track(track_name, duration, location)
+        self.view.insert_track(track_name)
+
+        with patch("pygame.mixer.music.load"), \
+                patch("pygame.mixer.music.play"), \
+                patch.object(View, "set_song_slider"), \
+                patch.object(View, "song_slider_on"), \
+                patch.object(View, "change_play_to_stop_icon") as mock_change_play_to_stop_icon:
+            self.view.select_track(0)
+            self.controller.listbox_select()
+            self.controller.play_track()
+
+            del_file()
+
+            # time.sleep(3)
+            # mock_change_play_to_stop_icon.assert_called_once()
+
+    def test_play_track_no_track_selected(self):
+        self.set_up()
+        track_name = "A Day To Remember - End Of Me"
+        location = "D:/Users/vopor/Music/A Day To Remember - End Of Me.mp3"
+        duration = 180
+        self.model.add_track(track_name, duration, location)
+        self.view.insert_track(track_name)
+
+        with patch("pygame.mixer.music.load"), \
+                patch("pygame.mixer.music.play"), \
+                patch.object(View, "set_song_slider"), \
+                patch.object(View, "song_slider_on"), \
+                patch.object(View, "change_play_to_stop_icon") as mock_change_play_to_stop_icon:
+            self.view.select_track(0)
+            self.controller.listbox_select()
+            self.controller.play_track()
+
+        self.view.show_error.assert_called_once_with("Choose track to play")
+        assert not self.controller.isPlaying
+
+    def test_stop_track(self):
+        self.set_up()
+        track_name = "A Day To Remember - End Of Me"
+        location = "D:/Users/vopor/Music/A Day To Remember - End Of Me.mp3"
+        duration = 180
+        self.model.add_track(track_name, duration, location)
+        self.view.insert_track(track_name)
+        self.view.select_track(0)
+        self.controller.listbox_select()
+        self.controller.play_track()
+        self.controller.stop_track()
+        self.assertFalse(self.controller.mixer.music.get_busy())
+        del_file()
+
+    def test_pause_track(self):
+        self.set_up()
+        track_name = "A Day To Remember - End Of Me"
+        location = "D:/Users/vopor/Music/A Day To Remember - End Of Me.mp3"
+        duration = 180
+        self.model.add_track(track_name, duration, location)
+        self.view.insert_track(track_name)
+        self.view.select_track(0)
+        self.controller.listbox_select()
+        self.controller.play_track()
+        self.controller.pause_track()
+        self.assertFalse(self.controller.isPlaying)
+        self.assertTrue(self.controller.isPaused)
+        self.assertFalse(self.controller.mixer.music.get_busy())
+        del_file()
+
+    def test_unpause_track(self):
+        self.set_up()
+        track_name = "A Day To Remember - End Of Me"
+        location = "D:/Users/vopor/Music/A Day To Remember - End Of Me.mp3"
+        duration = 180
+        self.model.add_track(track_name, duration, location)
+        self.view.insert_track(track_name)
+        self.view.select_track(0)
+        self.controller.listbox_select()
+        self.controller.play_track()
+        self.controller.pause_track()
+        self.controller.unpause_track()
+        self.assertTrue(self.controller.isPlaying)
+        self.assertFalse(self.controller.isPaused)
+        self.assertTrue(self.controller.mixer.music.get_busy())
+        del_file()
+
+    def test_next_track_success(self):
+        self.set_up()
+        track_name1 = "A Day To Remember - End Of Me"
+        location1 = "D:/Users/vopor/Music/A Day To Remember - End Of Me.mp3"
+        duration1 = 180
+        self.model.add_track(track_name1, duration1, location1)
+        self.view.insert_track(track_name1)
+        self.view.select_track(0)
+        self.controller.listbox_select()
+        self.controller.play_track()
+        self.controller.next_track()
+        self.assertTrue(self.controller.curr_track_pos[0] == 0)
+        self.assertTrue(self.controller.mixer.music.get_busy())
+        track_name2 = "Aero Chord - Surface"
+        location2 = "D:/Users/vopor/Music/Aero Chord - Surface.mp3"
+        duration2 = 254
+        self.model.add_track(track_name2, duration2, location2)
+        self.view.insert_track(track_name2)
+        self.controller.next_track()
+        self.assertTrue(self.controller.curr_track_pos[0] == 1)
+        self.assertTrue(self.controller.mixer.music.get_busy())
+        track_name3 = "AJR - Weak"
+        location3 = "D:/Users/vopor/Music/AJR - Weak.mp3"
+        duration3 = 201
+        self.model.add_track(track_name3, duration3, location3)
+        self.view.insert_track(track_name3)
+        self.controller.next_track()
+        self.assertTrue(self.controller.curr_track_pos[0] == 2)
+        self.assertTrue(self.controller.mixer.music.get_busy())
+        del_file()
+
+    def test_next_track_fail(self):
+        self.set_up()
+        self.controller.next_track()
+        self.assertEqual(self.controller.curr_track_pos, None)
+        self.assertEqual(self.controller.selected_track_pos, None)
+        self.assertFalse(self.controller.mixer.music.get_busy())
+        track_name = "A Day To Remember - End Of Me"
+        location = "D:/Users/vopor/Music/A Day To Remember - End Of Me.mp3"
+        duration = 180
+        self.model.add_track(track_name, duration, location)
+        self.view.insert_track(track_name)
+        self.controller.next_track()
+        self.assertEqual(self.controller.curr_track_pos, None)
+        self.assertEqual(self.controller.selected_track_pos, None)
+        self.assertFalse(self.controller.mixer.music.get_busy())
+        del_file()
+
+    def test_prev_track_success(self):
+        self.set_up()
+        track_name1 = "A Day To Remember - End Of Me"
+        location1 = "D:/Users/vopor/Music/A Day To Remember - End Of Me.mp3"
+        duration1 = 180
+        self.model.add_track(track_name1, duration1, location1)
+        self.view.insert_track(track_name1)
+        self.view.select_track(0)
+        self.controller.listbox_select()
+        self.controller.play_track()
+        self.controller.prev_track()
+        self.assertTrue(self.controller.curr_track_pos[0] == 0)
+        self.assertTrue(self.controller.mixer.music.get_busy())
+        track_name2 = "Aero Chord - Surface"
+        location2 = "D:/Users/vopor/Music/Aero Chord - Surface.mp3"
+        duration2 = 254
+        self.model.add_track(track_name2, duration2, location2)
+        self.view.insert_track(track_name2)
+        self.controller.prev_track()
+        self.assertTrue(self.controller.curr_track_pos[0] == 1)
+        self.assertTrue(self.controller.mixer.music.get_busy())
+        track_name3 = "AJR - Weak"
+        location3 = "D:/Users/vopor/Music/AJR - Weak.mp3"
+        duration3 = 201
+        self.model.add_track(track_name3, duration3, location3)
+        self.view.insert_track(track_name3)
+        self.controller.prev_track()
+        self.assertTrue(self.controller.curr_track_pos[0] == 0)
+        self.assertTrue(self.controller.mixer.music.get_busy())
+        del_file()
+
+    def test_prev_track_fail(self):
+        self.set_up()
+        self.controller.next_track()
+        self.assertEqual(self.controller.curr_track_pos, None)
+        self.assertEqual(self.controller.selected_track_pos, None)
+        self.assertFalse(self.controller.mixer.music.get_busy())
+        track_name = "A Day To Remember - End Of Me"
+        location = "D:/Users/vopor/Music/A Day To Remember - End Of Me.mp3"
+        duration = 180
+        self.model.add_track(track_name, duration, location)
+        self.view.insert_track(track_name)
+        self.controller.prev_track()
+        self.assertEqual(self.controller.curr_track_pos, None)
+        self.assertEqual(self.controller.selected_track_pos, None)
+        self.assertFalse(self.controller.mixer.music.get_busy())
+        del_file()
 
     def test_song_slider_on(self):
         self.set_up()
@@ -194,11 +297,11 @@ class TestAudioPlayer(unittest.TestCase):
         self.controller.song_position_change(None)
         self.assertEqual(self.view.curr_time_label.cget("text"), "1:40")
 
-    # def update_slider_pos(self):
-    #     self.set_up()
-    #     with patch("pygame.mixer.music.stop") as mock_stop:
-    #         self.controller.stop_track()
-    #         mock_stop.assert_called_once()
+    def update_slider_pos(self):
+        self.set_up()
+        with patch("pygame.mixer.music.stop") as mock_stop:
+            self.controller.stop_track()
+            mock_stop.assert_called_once()
 
     def test_volume_change(self):
         self.set_up()

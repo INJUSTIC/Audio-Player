@@ -90,6 +90,7 @@ class View(tk.Frame):
         secs_text = str(secs)
         if secs < 10:
             secs_text = f'0{secs}'
+        print(mins, secs)
         self.curr_time_label.config(text=f'{mins}:{secs_text}')
 
     def select_track(self, index):

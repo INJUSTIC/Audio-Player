@@ -1,3 +1,5 @@
+import threading
+
 import pygame
 from Model import Model
 from View import View
@@ -58,6 +60,8 @@ class Controller:
                 self.view.change_stop_to_play_icon()
                 self.stop_track()
                 self.view.song_slider_off()
+            elif not self.curr_track_pos:
+                self.selected_track_pos = None
             else:
                 if self.selected_track_pos[0] < self.curr_track_pos[0]:
                     self.curr_track_pos = (self.curr_track_pos[0] - 1,)
@@ -85,12 +89,7 @@ class Controller:
             self.view.show_error("Choose track to play")
             return
         track_to_play = self.view.track_listbox.get(tk.ACTIVE)
-        try:
-            track = self.model.read_track(track_to_play)
-        except ValueError:
-            print('ValueError: no such track')
-            self.isPlaying = False
-            return
+        track = self.model.read_track(track_to_play)
         try:
             self.mixer.music.load(track.path)
             song = MP3(track.path)
@@ -105,7 +104,9 @@ class Controller:
         self.view.song_slider_on(track.duration)
         self.isPlaying = True
         self.curr_track_pos = self.selected_track_pos
-        self.check_for_track_ending()
+        # thread = threading.Thread(target=self.check_for_track_ending)
+        # thread.start()
+       # self.check_for_track_ending()
 
     def listbox_select(self):
         self.selected_track_pos = self.view.track_listbox.curselection()
@@ -156,6 +157,7 @@ class Controller:
 
     def song_position_change(self, event):
         position = self.view.song_slider.get() / 1000
+        print(position)
         self.mixer.music.set_pos(position)
         self.view.update_song_slider(position * 1000)
 
@@ -165,5 +167,5 @@ class Controller:
         self.view.master.after(1000, self.update_slider_pos)
 
     def volume_change(self, value):
-        volume = float(value) / 100
+        volume = 1 - (float(value) / 100)
         mixer.music.set_volume(volume)

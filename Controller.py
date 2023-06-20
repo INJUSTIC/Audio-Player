@@ -95,7 +95,7 @@ class Controller:
             song = MP3(track.path)
         except pygame.error:
             self.isPlaying = False
-            self.view.show_error("f'No file found: {track.path}'")
+            self.view.show_error(f'No file found: {track.path}')
             return
         self.mixer.music.play(loops=0)
         self.view.change_play_to_stop_icon()

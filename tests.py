@@ -1,12 +1,8 @@
 import os
-import time
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 from tkinter import messagebox
 from tkinter import *
-
-from mutagen.mp3 import MP3
-
 from Controller import Controller
 from Model import Model
 from View import View
@@ -19,7 +15,7 @@ def del_file():
 
 class TestAudioPlayer(unittest.TestCase):
 
-    def setUp(self) -> None:
+    def setUp(self):
         self.view = View(Tk())
 
     def set_up(self):
@@ -41,7 +37,8 @@ class TestAudioPlayer(unittest.TestCase):
             self.assertEqual(self.view.track_listbox.get('end'), track_name)
             del_file()
 
-    def test_add_track_existing(self):
+
+    def test_add_track_already_exist(self):
         self.set_up()
 
         track_name = "A Day To Remember - End Of Me"
@@ -59,7 +56,6 @@ class TestAudioPlayer(unittest.TestCase):
 
     def test_add_track_incorr_path(self):
         self.set_up()
-
         location = ""
         with patch("tkinter.filedialog.askopenfilename", return_value=location), \
                 patch("Model.FileManager.update_file") as mock_update_file, \
@@ -71,7 +67,6 @@ class TestAudioPlayer(unittest.TestCase):
 
     def test_remove_track_success(self):
         self.set_up()
-
         track_name = "A Day To Remember - End Of Me"
         location = "D:/Users/vopor/Music/A Day To Remember - End Of Me.mp3"
         with patch("tkinter.filedialog.askopenfilename", return_value=location):
@@ -85,7 +80,6 @@ class TestAudioPlayer(unittest.TestCase):
 
     def test_remove_track_err(self):
         self.set_up()
-
         track_name = "A Day To Remember - End Of Me"
         duration = 238
         location = "D:/Users/vopor/Music/A Day To Remember - End Of Me.mp3"
@@ -95,55 +89,50 @@ class TestAudioPlayer(unittest.TestCase):
             mock_showerror.assert_called_once_with("Error", "Choose a track to delete")
             del_file()
 
-    # Poniższe 6 nie działają bo w czasie wykonania funkcji play_track wyskocza błąd rekursji że jest przekroczony jej limit
-    def test_play_track(self):
+    def test_play_track_success(self):
         self.set_up()
-
-        track_name = "A Day To Remember - End Of Me"
         location = "D:/Users/vopor/Music/A Day To Remember - End Of Me.mp3"
-        duration = 180
-        self.model.add_track(track_name, duration, location)
-        self.view.insert_track(track_name)
-
-        with patch("pygame.mixer.music.load"), \
-                patch("pygame.mixer.music.play"), \
-                patch.object(View, "set_song_slider"), \
-                patch.object(View, "song_slider_on"), \
-                patch.object(View, "change_play_to_stop_icon") as mock_change_play_to_stop_icon:
-            self.view.select_track(0)
-            self.controller.listbox_select()
-            self.controller.play_track()
-
-            del_file()
-
-            # time.sleep(3)
-            # mock_change_play_to_stop_icon.assert_called_once()
+        with patch("tkinter.filedialog.askopenfilename", return_value=location):
+            self.controller.add_track()
+        self.view.select_track(0)
+        self.controller.listbox_select()
+        self.controller.play_track()
+        self.assertTrue(self.view.song_slider.winfo_width(), 238)
+        self.assertTrue(self.controller.mixer.music.get_busy())
+        self.assertTrue(self.controller.isPlaying)
+        self.assertTrue(self.view.song_time_label.cget("text") == "3:58")
+        del_file()
 
     def test_play_track_no_track_selected(self):
         self.set_up()
-        track_name = "A Day To Remember - End Of Me"
         location = "D:/Users/vopor/Music/A Day To Remember - End Of Me.mp3"
-        duration = 180
-        self.model.add_track(track_name, duration, location)
-        self.view.insert_track(track_name)
+        with patch("tkinter.filedialog.askopenfilename", return_value=location), \
+             patch.object(self.controller.view, "show_error") as mock_show_error:
+            self.controller.add_track()
+            self.controller.play_track()
+            mock_show_error.assert_called_once_with("Choose track to play")
+            self.assertFalse(self.controller.isPlaying)
+        del_file()
 
-        with patch("pygame.mixer.music.load"), \
-                patch("pygame.mixer.music.play"), \
-                patch.object(View, "set_song_slider"), \
-                patch.object(View, "song_slider_on"), \
-                patch.object(View, "change_play_to_stop_icon") as mock_change_play_to_stop_icon:
+    def test_play_track_no_file_found(self):
+        self.set_up()
+        location = "D:/Users/vopor/Music/Billy Talent - Fallen Leaves.mp3"
+        with patch("tkinter.filedialog.askopenfilename", return_value=location), \
+             patch.object(self.controller.view, "show_error") as mock_show_error:
+            self.controller.add_track()
             self.view.select_track(0)
             self.controller.listbox_select()
+            os.remove(location)
             self.controller.play_track()
-
-        self.view.show_error.assert_called_once_with("Choose track to play")
-        assert not self.controller.isPlaying
+            mock_show_error.assert_called_once_with(f"No file found: {location}")
+        self.assertFalse(self.controller.isPlaying)
+        del_file()
 
     def test_stop_track(self):
         self.set_up()
         track_name = "A Day To Remember - End Of Me"
         location = "D:/Users/vopor/Music/A Day To Remember - End Of Me.mp3"
-        duration = 180
+        duration = 238
         self.model.add_track(track_name, duration, location)
         self.view.insert_track(track_name)
         self.view.select_track(0)
@@ -157,7 +146,7 @@ class TestAudioPlayer(unittest.TestCase):
         self.set_up()
         track_name = "A Day To Remember - End Of Me"
         location = "D:/Users/vopor/Music/A Day To Remember - End Of Me.mp3"
-        duration = 180
+        duration = 238
         self.model.add_track(track_name, duration, location)
         self.view.insert_track(track_name)
         self.view.select_track(0)
@@ -173,7 +162,7 @@ class TestAudioPlayer(unittest.TestCase):
         self.set_up()
         track_name = "A Day To Remember - End Of Me"
         location = "D:/Users/vopor/Music/A Day To Remember - End Of Me.mp3"
-        duration = 180
+        duration = 238
         self.model.add_track(track_name, duration, location)
         self.view.insert_track(track_name)
         self.view.select_track(0)
@@ -190,7 +179,7 @@ class TestAudioPlayer(unittest.TestCase):
         self.set_up()
         track_name1 = "A Day To Remember - End Of Me"
         location1 = "D:/Users/vopor/Music/A Day To Remember - End Of Me.mp3"
-        duration1 = 180
+        duration1 = 238
         self.model.add_track(track_name1, duration1, location1)
         self.view.insert_track(track_name1)
         self.view.select_track(0)
@@ -225,7 +214,7 @@ class TestAudioPlayer(unittest.TestCase):
         self.assertFalse(self.controller.mixer.music.get_busy())
         track_name = "A Day To Remember - End Of Me"
         location = "D:/Users/vopor/Music/A Day To Remember - End Of Me.mp3"
-        duration = 180
+        duration = 238
         self.model.add_track(track_name, duration, location)
         self.view.insert_track(track_name)
         self.controller.next_track()
@@ -238,7 +227,7 @@ class TestAudioPlayer(unittest.TestCase):
         self.set_up()
         track_name1 = "A Day To Remember - End Of Me"
         location1 = "D:/Users/vopor/Music/A Day To Remember - End Of Me.mp3"
-        duration1 = 180
+        duration1 = 238
         self.model.add_track(track_name1, duration1, location1)
         self.view.insert_track(track_name1)
         self.view.select_track(0)
@@ -273,7 +262,7 @@ class TestAudioPlayer(unittest.TestCase):
         self.assertFalse(self.controller.mixer.music.get_busy())
         track_name = "A Day To Remember - End Of Me"
         location = "D:/Users/vopor/Music/A Day To Remember - End Of Me.mp3"
-        duration = 180
+        duration = 238
         self.model.add_track(track_name, duration, location)
         self.view.insert_track(track_name)
         self.controller.prev_track()

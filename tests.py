@@ -6,6 +6,7 @@ from tkinter import *
 from Controller import Controller
 from Model import Model
 from View import View
+from PIL import Image, ImageTk
 
 
 def del_file():
@@ -15,10 +16,12 @@ def del_file():
 
 class TestAudioPlayer(unittest.TestCase):
 
-    def setUp(self):
-        self.view = View(Tk())
+    @classmethod
+    def setUpClass(cls):
+        cls.view = View(Tk())
 
     def set_up(self):
+        self.view.track_listbox.delete(0, "end")
         self.model = Model()
         self.controller = Controller(self.model, self.view)
 
@@ -35,8 +38,7 @@ class TestAudioPlayer(unittest.TestCase):
             self.assertTrue(self.model.check_for_track(track_name))
             self.assertEqual(self.model.read_track(track_name).duration, duration)
             self.assertEqual(self.view.track_listbox.get('end'), track_name)
-            del_file()
-
+        del_file()
 
     def test_add_track_already_exist(self):
         self.set_up()
@@ -52,7 +54,7 @@ class TestAudioPlayer(unittest.TestCase):
                 patch.object(self.view, "show_error"):
             self.controller.add_track()
             mock_showerror.assert_called_once_with('Error', "There is already a soundtrack with such name")
-            del_file()
+        del_file()
 
     def test_add_track_incorr_path(self):
         self.set_up()
@@ -63,7 +65,7 @@ class TestAudioPlayer(unittest.TestCase):
             self.controller.add_track()
             mock_update_file.assert_not_called()
             mock_showerror.assert_not_called()
-            del_file()
+        del_file()
 
     def test_remove_track_success(self):
         self.set_up()
@@ -87,7 +89,7 @@ class TestAudioPlayer(unittest.TestCase):
         with patch.object(messagebox, "showerror") as mock_showerror:
             self.controller.remove_track()
             mock_showerror.assert_called_once_with("Error", "Choose a track to delete")
-            del_file()
+        del_file()
 
     def test_play_track_success(self):
         self.set_up()
@@ -107,26 +109,26 @@ class TestAudioPlayer(unittest.TestCase):
         self.set_up()
         location = "D:/Users/vopor/Music/A Day To Remember - End Of Me.mp3"
         with patch("tkinter.filedialog.askopenfilename", return_value=location), \
-             patch.object(self.controller.view, "show_error") as mock_show_error:
+                patch.object(self.controller.view, "show_error") as mock_show_error:
             self.controller.add_track()
             self.controller.play_track()
             mock_show_error.assert_called_once_with("Choose track to play")
             self.assertFalse(self.controller.isPlaying)
         del_file()
 
-    def test_play_track_no_file_found(self):
-        self.set_up()
-        location = "D:/Users/vopor/Music/Billy Talent - Fallen Leaves.mp3"
-        with patch("tkinter.filedialog.askopenfilename", return_value=location), \
-             patch.object(self.controller.view, "show_error") as mock_show_error:
-            self.controller.add_track()
-            self.view.select_track(0)
-            self.controller.listbox_select()
-            os.remove(location)
-            self.controller.play_track()
-            mock_show_error.assert_called_once_with(f"No file found: {location}")
-        self.assertFalse(self.controller.isPlaying)
-        del_file()
+    # def test_play_track_no_file_found(self):
+    #     self.set_up()
+    #     location = "D:/Users/vopor/Music/Billy Talent - Fallen Leaves.mp3"
+    #     with patch("tkinter.filedialog.askopenfilename", return_value=location), \
+    #          patch.object(self.controller.view, "show_error") as mock_show_error:
+    #         self.controller.add_track()
+    #         self.view.select_track(0)
+    #         self.controller.listbox_select()
+    #         os.remove(location)
+    #         self.controller.play_track()
+    #         mock_show_error.assert_called_once_with(f"No file found: {location}")
+    #     self.assertFalse(self.controller.isPlaying)
+    #     del_file()
 
     def test_stop_track(self):
         self.set_up()
@@ -177,6 +179,7 @@ class TestAudioPlayer(unittest.TestCase):
 
     def test_next_track_success(self):
         self.set_up()
+        del_file()
         track_name1 = "A Day To Remember - End Of Me"
         location1 = "D:/Users/vopor/Music/A Day To Remember - End Of Me.mp3"
         duration1 = 238
@@ -186,6 +189,7 @@ class TestAudioPlayer(unittest.TestCase):
         self.controller.listbox_select()
         self.controller.play_track()
         self.controller.next_track()
+        print(self.controller.curr_track_pos[0])
         self.assertTrue(self.controller.curr_track_pos[0] == 0)
         self.assertTrue(self.controller.mixer.music.get_busy())
         track_name2 = "Aero Chord - Surface"

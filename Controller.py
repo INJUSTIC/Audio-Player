@@ -157,7 +157,6 @@ class Controller:
 
     def song_position_change(self, event):
         position = self.view.song_slider.get() / 1000
-        print(position)
         self.mixer.music.set_pos(position)
         self.view.update_song_slider(position * 1000)
 
